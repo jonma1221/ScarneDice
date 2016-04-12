@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -77,10 +79,7 @@ public class MainActivity extends AppCompatActivity {
     private void computerTurn() {
         roll.setEnabled(false);
         hold.setEnabled(false);
-            while(playerFinished && player2.getTurnScore() < 10) {
-                rollDice(player2);
-            }
-
+        rollDice(player2);
         roll.setEnabled(true);
         hold.setEnabled(true);
         if(playerFinished) updateScore(player2);
@@ -122,6 +121,9 @@ public class MainActivity extends AppCompatActivity {
     private void rollDice(Player player) {
         rand = new Random();
         currentRoll = rand.nextInt(6) + 1;
+        RotateAnimation rotateAnimation = new RotateAnimation(30, 90,
+                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        dice.setAnimation(rotateAnimation);
         updateDiceImage(currentRoll);
         turnNumber++;
         currentTurn.setText("Turn: " + turnNumber);
