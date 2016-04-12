@@ -88,9 +88,10 @@ public class MainActivity extends AppCompatActivity {
     private void updateScore(Player player) {
         int overallScore = 0;
         overallScore = tempScore + player.getOverallScore();
-        player.setOverallScore(overallScore);
+        player.setOverallScore(overallScore); //update ending player's overall score
         resetTempScore(player);
         Log.i("Player finished","" + playerFinished);
+
         if(playerFinished){
             score2.setText("" + player.getOverallScore());
         }
@@ -99,21 +100,21 @@ public class MainActivity extends AppCompatActivity {
         playerFinished =  playerFinished ? false: true; // current player is finished with round
         Log.i("Player finished After","" + playerFinished);
 
-        if(player1.getOverallScore() >= 100){
+        if(player1.getOverallScore() >= 100){ // Player wins
             Toast.makeText(MainActivity.this,"Player 1 wins!",Toast.LENGTH_SHORT).show();
             roll.setEnabled(false);
             hold.setEnabled(false);
             return;
         }
-        else if(player2.getOverallScore() >= 100){
+        else if(player2.getOverallScore() >= 100){ // Computer wins
             Toast.makeText(MainActivity.this,"Computer wins!",Toast.LENGTH_SHORT).show();
             roll.setEnabled(false);
             hold.setEnabled(false);
             return;
         }
 
-        if(playerFinished){
-            Log.i("Entered","Computer's turn");
+        if(playerFinished){ // Computer's turn
+            Log.i("Playing now","Computer's turn");
             computerTurn();
         }
     }
@@ -121,14 +122,19 @@ public class MainActivity extends AppCompatActivity {
     private void rollDice(Player player) {
         rand = new Random();
         currentRoll = rand.nextInt(6) + 1;
+        // rotate animation for the dice
         RotateAnimation rotateAnimation = new RotateAnimation(30, 90,
                 Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
         dice.setAnimation(rotateAnimation);
+
+        // update the dice image according to what was rolled
         updateDiceImage(currentRoll);
+        // update amount of turns taken so far
         turnNumber++;
         currentTurn.setText("Turn: " + turnNumber);
         Log.i("Current roll","" + currentRoll);
-        if(currentRoll != 1){
+
+        if(currentRoll != 1){ // update turn total if a 1 hasn't been rolled
             tempScore += currentRoll;
             rollTotal.setText("Roll total: " + tempScore);
             Log.i("Roll total","" + tempScore);
@@ -136,13 +142,15 @@ public class MainActivity extends AppCompatActivity {
         }
         else {
             resetTempScore(player);
-            playerFinished =  playerFinished ? false: true;
+            playerFinished =  playerFinished ? false: true; // end turn for current player
             if(playerFinished){
                 Log.i("Entered","Computer's turn");
                 computerTurn();
             }
         }
     }
+
+    // reset overall and turn score for all players
     private void resetEverything(Player player){
         player.setTurnScore(0);
         player.setOverallScore(0);
@@ -150,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
         hold.setEnabled(true);
     }
 
+    // reset turn total when next player is up
     private void resetTempScore(Player player) {
         tempScore = 0;
         turnNumber = 0;
