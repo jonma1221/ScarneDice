@@ -1,6 +1,6 @@
 package com.jonathan.scarnedice;
 
-import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,10 +16,10 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     Random rand;
+    private ImageView dice;
     private ImageButton roll;
     private ImageButton hold;
     private ImageButton reset;
-    private ImageView dice;
     private TextView currentTurn;
     private TextView rollTotal;
     private TextView score1;
@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     Player player1;
     Player player2;
 
-    private int turnNumber = 0;
+    private int turnTotal = 0;
     private int currentRoll = 0;
     private int tempScore = 0;
     private boolean playerFinished = false;
@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
         roll = (ImageButton)findViewById(R.id.rollButton);
         roll.setOnClickListener(new View.OnClickListener()   {
             public void onClick(View v)  {
+                currentTurn.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.colorPrimary));
+                rollTotal.setTextColor(ContextCompat.getColor(MainActivity.this, R.color.colorPrimary));
                 rollDice(player1);
             }
         });
@@ -79,10 +81,43 @@ public class MainActivity extends AppCompatActivity {
     private void computerTurn() {
         roll.setEnabled(false);
         hold.setEnabled(false);
+        currentTurn.setTextColor(ContextCompat.getColor(this, R.color.colorAccent));
+        rollTotal.setTextColor(ContextCompat.getColor(this, R.color.colorAccent));
         rollDice(player2);
         roll.setEnabled(true);
         hold.setEnabled(true);
         if(playerFinished) updateScore(player2);
+    }
+
+    private void rollDice(Player player) {
+        rand = new Random();
+        currentRoll = rand.nextInt(6) + 1;
+        // rotate animation for the dice
+        RotateAnimation rotateAnimation = new RotateAnimation(30, 90,
+                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        dice.setAnimation(rotateAnimation);
+
+        // update the dice image according to what was rolled
+        updateDiceImage(currentRoll);
+        // update amount of turns taken so far
+        turnTotal++;
+        currentTurn.setText("Turn: " + turnTotal);
+        Log.i("Current roll","" + currentRoll);
+
+        if(currentRoll != 1){ // update turn total if a 1 hasn't been rolled
+            tempScore += currentRoll;
+            rollTotal.setText("Roll total: " + tempScore);
+            Log.i("Roll total","" + tempScore);
+            player.setTurnScore(tempScore);
+        }
+        else {
+            resetTempScore(player);
+            playerFinished =  !playerFinished; // end turn for current player
+            if(playerFinished){
+                Log.i("Entered","Computer's turn");
+                computerTurn();
+            }
+        }
     }
 
     private void updateScore(Player player) {
@@ -97,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         }
         else score1.setText("" + player.getOverallScore());
 
-        playerFinished =  playerFinished ? false: true; // current player is finished with round
+        playerFinished =  !playerFinished; // current player is finished with round
         Log.i("Player finished After","" + playerFinished);
 
         if(player1.getOverallScore() >= 100){ // Player wins
@@ -119,36 +154,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void rollDice(Player player) {
-        rand = new Random();
-        currentRoll = rand.nextInt(6) + 1;
-        // rotate animation for the dice
-        RotateAnimation rotateAnimation = new RotateAnimation(30, 90,
-                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        dice.setAnimation(rotateAnimation);
-
-        // update the dice image according to what was rolled
-        updateDiceImage(currentRoll);
-        // update amount of turns taken so far
-        turnNumber++;
-        currentTurn.setText("Turn: " + turnNumber);
-        Log.i("Current roll","" + currentRoll);
-
-        if(currentRoll != 1){ // update turn total if a 1 hasn't been rolled
-            tempScore += currentRoll;
-            rollTotal.setText("Roll total: " + tempScore);
-            Log.i("Roll total","" + tempScore);
-            player.setTurnScore(tempScore);
-        }
-        else {
-            resetTempScore(player);
-            playerFinished =  playerFinished ? false: true; // end turn for current player
-            if(playerFinished){
-                Log.i("Entered","Computer's turn");
-                computerTurn();
-            }
-        }
-    }
 
     // reset overall and turn score for all players
     private void resetEverything(Player player){
@@ -161,8 +166,8 @@ public class MainActivity extends AppCompatActivity {
     // reset turn total when next player is up
     private void resetTempScore(Player player) {
         tempScore = 0;
-        turnNumber = 0;
-        currentTurn.setText("Turn: " + turnNumber);
+        turnTotal = 0;
+        currentTurn.setText("Turn: " + turnTotal);
         player.setTurnScore(0);
     }
 
