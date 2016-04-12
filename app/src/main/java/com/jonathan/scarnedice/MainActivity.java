@@ -72,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 resetEverything(player1);
                 resetEverything(player2);
+                currentTurn.setText("Turn: 0");
+                rollTotal.setText("Roll Total: 0");
                 score1.setText("" + player1.getOverallScore());
                 score2.setText("" + player1.getOverallScore());
             }
